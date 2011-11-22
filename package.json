@@ -1,5 +1,5 @@
 {
-  "name": "mp",
+  "name": "mp-command",
   "description": "Message Ports commandline utility",
   "author": "Myles Byrne",
   "version": "0.0.1",
