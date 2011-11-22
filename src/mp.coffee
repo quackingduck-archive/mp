@@ -4,6 +4,7 @@ mp = require 'message-ports'
 @run = (args) ->
   type = args.shift()
   type = typeAliases[type] if typeAliases[type]?
+  printUsageAndExitWithError() unless type?
   validateType type
   port = args.shift()
   validatePort port
@@ -118,5 +119,23 @@ printUsageAndExitWithError = ->
 
 # todo: expand
 usage = """
-usage: mp reply 2000
+Usage:
+  mp <port-type> <port-number>
+
+Required:
+  <port-type>
+    Can be one of: req, rep, pub, sub, push, pull
+
+  <port-number>
+    Must be a valid tcp port
+
+Each port type can be thought of as one end of a client/server connection.
+
+Request (req) ports must connect to Reply (rep) ports
+Subscribe (sub) ports must connect to Publish (pub) ports
+Push ports must connect to Pull ports
+
+Examples:
+  mp req 2000
+  mp rep 2000
 """
