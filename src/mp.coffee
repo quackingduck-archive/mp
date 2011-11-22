@@ -87,7 +87,7 @@ for name, longName of { push: 'push', pub: 'publish' }
 
     getAndSendMsg()
 
-im.info      = (msg) -> console.log '- ' + msg
+im.info      = (msg) -> console.log ansi.gray + '- ' + msg + ansi.reset
 im.received  = (msg) -> console.log '> ' + msg
 
 # --
@@ -95,20 +95,22 @@ im.received  = (msg) -> console.log '> ' + msg
 typeAliases =
   request: 'req', reply: 'rep', publish: 'pub', subscribe: 'sub'
 
-typeExp = /// ^ rep | req | push | pull | pub | sub $ ///
-portExp = /// ^ \d+ $ ///
-
-# todo
 validateType = (type) ->
   unless typeExp.test type
     console.log "#{type} isn't a valid message port type"
     printUsageAndExitWithError()
 
 validatePort = (port) ->
-  # todo: validate port in range
   unless portExp.test port
     console.log "#{port} isn't a valid port number"
     printUsageAndExitWithError()
+
+typeExp = /// ^ rep | req | push | pull | pub | sub $ ///
+portExp = /// ^ \d+ $ ///
+
+ansi =
+  gray:  '\x1b[0;37m'
+  reset: '\x1b[m'
 
 printUsageAndExitWithError = ->
   console.log usage
