@@ -2,7 +2,7 @@
   "name": "mp-command",
   "description": "Message Ports commandline utility",
   "author": "Myles Byrne",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "./lib/mp.js",
   "bin": {
     "mp": "./bin/mp"
