@@ -1,6 +1,6 @@
 # mp
 
-The `mp` command line utility is like [curl] or [ncat] for [Message Ports]  (and [ZeroMQ] connections in general). It's a convenient way to experiment with different kinds of inter-process messaging patterns without having to write any code.
+The `mp` command line utility is like [curl] or [ncat] for [Message Ports][]  (and [ZeroMQ] connections in general). It's a convenient way to experiment with different kinds of inter-process messaging patterns from the comfort of your shell.
 
 [curl]:http://curl.haxx.se
 [ncat]:http://nmap.org/ncat
