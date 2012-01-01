@@ -1,14 +1,14 @@
 {
   "name": "mp-command",
-  "description": "Message Ports commandline utility",
+  "description": "Command line utility for Message Ports",
   "author": "Myles Byrne",
-  "version": "0.0.2",
+  "version": "0.0.3-dev",
   "main": "./lib/mp.js",
   "bin": {
     "mp": "./bin/mp"
   },
   "engines": {
-    "node": "~0.4"
+    "node": ">=0.4"
   },
   "dependencies": {
     "message-ports": "0.2.4"
