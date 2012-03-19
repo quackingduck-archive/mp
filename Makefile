@@ -15,4 +15,9 @@ test-internals :
 
 # ---
 
+tag :
+	git tag v`coffee -e "console.log JSON.parse(require('fs').readFileSync 'package.json').version"`
+
+# ---
+
 .PHONY: lib
