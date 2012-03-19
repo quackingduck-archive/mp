@@ -6,4 +6,13 @@ lib :
 lib/%.js : src/%.coffee
 	./node_modules/.bin/coffee --compile --lint --output lib $<
 
+# ---
+
+test : test-internals
+
+test-internals :
+	./node_modules/.bin/mocha --ui qunit --bail --colors
+
+# ---
+
 .PHONY: lib
