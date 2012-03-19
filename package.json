@@ -11,10 +11,11 @@
     "node": ">=0.4"
   },
   "dependencies": {
-    "message-ports": "0.3.x"
+    "message-ports": "~0.4.1"
   },
   "devDependencies": {
-    "coffee-script": "~1.1.2"
+    "coffee-script": "~1.2.0",
+    "mocha": "~0.14.1"
   },
   "repository": {
     "type": "git",
