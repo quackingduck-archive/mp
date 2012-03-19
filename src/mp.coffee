@@ -1,18 +1,25 @@
 mp = require 'message-ports'
 
 # entry point
-@run = (args) ->
-  type = args.shift()
-  type = typeAliases[type] if typeAliases[type]?
-  printUsageAndExitWithError() unless type?
-  validateType type
-  port = args.shift()
-  validatePort port
-  port = parseInt port
-  if args.length is 0
-    interactiveMode type, port
-  else
-    printUsageAndExitWithError()
+@run = (rawArgs) ->
+  printUsageAndExit(1) if rawArgs.length is 0
+  args = parseArgs rawArgs
+
+  printUsageAndExit(0) if args.help is yes
+
+  type = parseType args.type
+  unless validateType type
+    console.log "#{type} isn't a valid port type"
+    printUsageAndExit(1)
+
+  port = parsePort args.port
+  unless validatePort port
+    console.log "#{port} isn't a valid port id"
+    printUsageAndExit(1)
+
+  interactiveMode type, port
+
+# ---
 
 # ## Interactive Modes
 
@@ -68,18 +75,18 @@ im.req = (portNumber, messagePort, getLine) ->
 
 # pull/subscribe and push/publish have the same interfaces at this level
 
-for name, longName of { pull: 'pull', sub: 'subscribe' }
+['pull', 'sub'].forEach (name) ->
 
   im[name] = (portNumber, messagePort) ->
-    im.info "started #{longName} socket on port #{portNumber}"
+    im.info "started #{im.longName name} socket on port #{portNumber}"
     messagePort (msg) ->
       im.info "message received:"
       im.received msg
 
-for name, longName of { push: 'push', pub: 'publish' }
+['push', 'pub'].forEach (name) ->
 
   im[name] = (portNumber, messagePort, getLine) ->
-    im.info "started #{longName} socket on port #{portNumber}"
+    im.info "started #{im.longName name} socket on port #{portNumber}"
     getAndSendMsg = ->
       getLine (line) ->
         messagePort line
@@ -91,43 +98,58 @@ for name, longName of { push: 'push', pub: 'publish' }
 im.info      = (msg) -> console.log ansi.gray + '- ' + msg + ansi.reset
 im.received  = (msg) -> console.log '> ' + msg
 
-# --
-
-typeAliases =
-  request: 'req', reply: 'rep', publish: 'pub', subscribe: 'sub'
-
-validateType = (type) ->
-  unless typeExp.test type
-    console.log "#{type} isn't a valid message port type"
-    printUsageAndExitWithError()
-
-validatePort = (port) ->
-  unless portExp.test port
-    console.log "#{port} isn't a valid port number"
-    printUsageAndExitWithError()
-
-typeExp = /// ^ rep | req | push | pull | pub | sub $ ///
-portExp = /// ^ \d+ $ ///
+im.longName = (portType) ->
+  {
+    req: 'request', rep: 'reply'
+    pub: 'publish', sub: 'subscribe'
+    push: 'push', pull: 'pull'
+  }[portType]
 
 ansi =
   gray:  '\x1b[0;37m'
   reset: '\x1b[m'
 
-printUsageAndExitWithError = ->
-  console.log usage
-  process.exit 1
+# --
 
-# todo: expand
+parseArgs = (rawArgs) ->
+  if rawArgs[0].match ///^ ( help | --help | -h ) $///
+    return { help: yes }
+
+  { type: rawArgs[0], port: rawArgs[1] }
+
+parseType = (typeArg) ->
+  # convert long names to short ones
+  { request: 'req', reply: 'rep', publish: 'pub', subscribe: 'sub' }[typeArg] or typeArg
+
+parsePort = (portArg) ->
+  # coerce numeric string into number
+  if portArg.match /// ^ \d+ $ /// then parseInt portArg else portArg
+
+validateType = (type) ->
+  type.match /// ^ ( rep | req | push | pull | pub | sub ) $ ///
+
+
+validatePort = (port) ->
+  return yes if typeof port is 'number'
+  return yes if typeof port is 'string' and port[0] is '/'
+  return yes if typeof port is 'string' and port.match /// ^ \w+ : // ///
+
+# ---
+
+printUsageAndExit = (status) ->
+  console.log usage
+  process.exit status
+
 usage = """
 Usage:
-  mp <port-type> <port-number>
+  mp <port-type> <port-id>
 
 Required:
   <port-type>
     Can be one of: req, rep, pub, sub, push, pull
 
-  <port-number>
-    Must be a valid tcp port
+  <port-id>
+    Must be a valid message port id
 
 Each port type can be thought of as one end of a client/server connection.
 
@@ -138,4 +160,10 @@ Push ports must connect to Pull ports
 Examples:
   mp req 2000
   mp rep 2000
+  mp pub /tmp/pub
+  mp sub /tmp/pub
 """
+
+# ---
+
+@_test = { parseArgs, parsePort, parseType, validatePort, validateType }
